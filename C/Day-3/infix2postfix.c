@@ -1,153 +1,159 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include <math.h>
 
 #define MAX 100
 
+// Stack for operators
+int opStack[MAX];
+int top = -1;
 
-char opStack[MAX];
-int valStack[MAX];
-int topOp = -1;
-int topVal = -1;
-
-
-void pushOp(char c) {
-    if (topOp == MAX - 1)
-        printf("Operator Stack Overflow\n");
-    else
-        opStack[++topOp] = c;
-}
-
-char popOp() {
-    if (topOp == -1)
-        return '\0';
-    else
-        return opStack[topOp--];
-}
-
-char peekOp() {
-    if (topOp == -1) return '\0';
-    return opStack[topOp];
-}
-
-void pushVal(int x) {
-    if (topVal == MAX - 1)
-        printf("Value Stack Overflow\n");
-    else
-        valStack[++topVal] = x;
-}
-
-int popVal() {
-    if (topVal == -1) {
-        printf("Value Stack Underflow\n");
-        return 0;
+void push(int x) {
+    if (top == MAX - 1) {
+        printf("Stack overflow\n");
+        exit(1);
     }
-    return valStack[topVal--];
+    opStack[++top] = x;
 }
 
+int pop() {
+    if (top == -1) {
+        printf("Stack underflow\n");
+        exit(1);
+    }
+    return opStack[top--];
+}
 
-int precedence(char c) {
-    if (c == '^') return 3;
-    if (c == '*' || c == '/') return 2;
-    if (c == '+' || c == '-') return 1;
+int peek() {
+    if (top == -1) return -1;
+    return opStack[top];
+}
+
+// Precedence of operators
+int precedence(char op) {
+    if (op == '+' || op == '-') return 1;
+    if (op == '*' || op == '/') return 2;
+    if (op == '^') return 3;
     return 0;
 }
 
-
-void InfixToPostfix(char infix[], char postfix[]) {
-    int i, k = 0;
-    char ch;
-
-    for (i = 0; i < strlen(infix); i++) {
-        ch = infix[i];
-
-        if (isalnum(ch)) { 
-            postfix[k++] = ch;
-        }
-        else if (ch == '(') {
-            pushOp(ch);
-        }
-        else if (ch == ')') {
-            while (peekOp() != '(' && topOp != -1) {
-                postfix[k++] = popOp();
+// Function to convert infix to postfix
+void infixToPostfix(char *infix, char *postfix) {
+    int i = 0, k = 0;
+    while (infix[i] != '\0') {
+        if (isdigit(infix[i])) {
+            // Extract full number (multi-digit)
+            while (isdigit(infix[i])) {
+                postfix[k++] = infix[i++];
             }
-            popOp(); 
+            postfix[k++] = ' '; // space as delimiter
+            continue;
         }
-        else { 
-            while (topOp != -1 && precedence(peekOp()) >= precedence(ch)) {
-                postfix[k++] = popOp();
+        else if (infix[i] == '(') {
+            push(infix[i]);
+        }
+        else if (infix[i] == ')') {
+            while (top != -1 && peek() != '(') {
+                postfix[k++] = pop();
+                postfix[k++] = ' ';
             }
-            pushOp(ch);
+            pop(); // pop '('
         }
+        else { // operator
+            while (top != -1 && precedence(peek()) >= precedence(infix[i])) {
+                postfix[k++] = pop();
+                postfix[k++] = ' ';
+            }
+            push(infix[i]);
+        }
+        i++;
     }
-
-
-    while (topOp != -1) {
-        postfix[k++] = popOp();
+    while (top != -1) {
+        postfix[k++] = pop();
+        postfix[k++] = ' ';
     }
     postfix[k] = '\0';
 }
 
-int EvaluatePostfix(char postfix[]) {
-    int i;
-    char ch;
-    int op1, op2, result;
+// Function to evaluate postfix expression
+int evaluatePostfix(char *postfix) {
+    int evalStack[MAX];
+    int evalTop = -1;
+    int i = 0;
 
-    for (i = 0; i < strlen(postfix); i++) {
-        ch = postfix[i];
-
-        if (isdigit(ch)) {
-            pushVal(ch - '0'); 
-        }
-        else {
-            op2 = popVal();
-            op1 = popVal();
-
-            switch (ch) {
-                case '+': result = op1 + op2; break;
-                case '-': result = op1 - op2; break;
-                case '*': result = op1 * op2; break;
-                case '/': result = op1 / op2; break;
-                case '^': result = pow(op1, op2); break;
+    while (postfix[i] != '\0') {
+        if (isdigit(postfix[i])) {
+            int num = 0;
+            while (isdigit(postfix[i])) {
+                num = num * 10 + (postfix[i] - '0');
+                i++;
             }
-            pushVal(result);
+            evalStack[++evalTop] = num;
         }
+        else if (postfix[i] == '+' || postfix[i] == '-' || 
+                 postfix[i] == '*' || postfix[i] == '/' || 
+                 postfix[i] == '^') {
+            int val2 = evalStack[evalTop--];
+            int val1 = evalStack[evalTop--];
+            int res;
+            switch (postfix[i]) {
+                case '+': res = val1 + val2; break;
+                case '-': res = val1 - val2; break;
+                case '*': res = val1 * val2; break;
+                case '/': res = val1 / val2; break;
+                case '^': {
+                    res = 1;
+                    for (int j = 0; j < val2; j++) res *= val1;
+                    break;
+                }
+            }
+            evalStack[++evalTop] = res;
+        }
+        i++;
     }
-    return popVal();
+    return evalStack[evalTop];
 }
 
+// Main Menu-driven Program
 int main() {
     char infix[MAX], postfix[MAX];
-    int choice, result;
+    int choice;
 
-    while (1) {
-        printf("\n--- MENU ---\n");
-        printf("1. Enter Infix Expression\n");
-        printf("2. Convert Infix to Postfix\n");
-        printf("3. Evaluate Postfix Expression\n");
-        printf("4. Exit\n");
-        printf("Enter choice: ");
+    do {
+        printf("\n==== MENU ====\n");
+        printf("1. Convert Infix to Postfix\n");
+        printf("2. Evaluate Postfix Expression\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
         scanf("%d", &choice);
+        getchar(); // consume newline
 
         switch (choice) {
             case 1:
                 printf("Enter infix expression: ");
-                scanf("%s", infix);
+                fgets(infix, MAX, stdin);
+                infix[strcspn(infix, "\n")] = '\0'; // remove newline
+                top = -1; // reset stack
+                infixToPostfix(infix, postfix);
+                printf("Postfix Expression: %s\n", postfix);
                 break;
-            case 2:
-                InfixToPostfix(infix, postfix);
-                printf("Postfix expression: %s\n", postfix);
-                break;
-            case 3:
-                result = EvaluatePostfix(postfix);
-                printf("Result: %d\n", result);
-                break;
-            case 4:
-                return 0;
-            default:
-                printf("Invalid choice\n");
-        }
-    }
-}
 
+            case 2:
+                printf("Enter postfix expression (space-separated): ");
+                fgets(postfix, MAX, stdin);
+                postfix[strcspn(postfix, "\n")] = '\0';
+                printf("Evaluation Result: %d\n", evaluatePostfix(postfix));
+                break;
+
+            case 3:
+                printf("Exiting program...\n");
+                break;
+
+            default:
+                printf("Invalid choice! Try again.\n");
+        }
+    } while (choice != 3);
+
+    return 0;
+}
