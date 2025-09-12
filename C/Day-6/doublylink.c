@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Node structure
 struct Node {
     int data;
     struct Node *prev, *next;
@@ -9,7 +8,6 @@ struct Node {
 
 struct Node* head = NULL;
 
-// Utility: Create a new node
 struct Node* createNode(int data) {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
     newNode->data = data;
@@ -17,9 +15,6 @@ struct Node* createNode(int data) {
     return newNode;
 }
 
-/* ===================== INSERTION ===================== */
-
-// Insert at beginning
 void insertAtBeginning(int data) {
     struct Node* newNode = createNode(data);
     if (head != NULL) {
@@ -30,7 +25,6 @@ void insertAtBeginning(int data) {
     printf("Inserted %d at beginning.\n", data);
 }
 
-// Insert at end
 void insertAtEnd(int data) {
     struct Node* newNode = createNode(data);
     if (head == NULL) {
@@ -44,7 +38,6 @@ void insertAtEnd(int data) {
     printf("Inserted %d at end.\n", data);
 }
 
-// Insert after a specific node
 void insertAfter(int key, int data) {
     struct Node* temp = head;
     while (temp != NULL && temp->data != key) temp = temp->next;
@@ -59,10 +52,6 @@ void insertAfter(int key, int data) {
     newNode->prev = temp;
     printf("Inserted %d after %d.\n", data, key);
 }
-
-/* ===================== DELETION ===================== */
-
-// Delete at beginning
 void deleteAtBeginning() {
     if (head == NULL) {
         printf("List empty!\n");
@@ -75,7 +64,7 @@ void deleteAtBeginning() {
     free(temp);
 }
 
-// Delete at end
+
 void deleteAtEnd() {
     if (head == NULL) {
         printf("List empty!\n");
@@ -84,12 +73,12 @@ void deleteAtEnd() {
     struct Node* temp = head;
     while (temp->next != NULL) temp = temp->next;
     if (temp->prev != NULL) temp->prev->next = NULL;
-    else head = NULL; // only one node
+    else head = NULL; 
     printf("Deleted %d from end.\n", temp->data);
     free(temp);
 }
 
-// Delete a specific node
+
 void deleteNode(int key) {
     struct Node* temp = head;
     while (temp != NULL && temp->data != key) temp = temp->next;
@@ -103,10 +92,6 @@ void deleteNode(int key) {
     printf("Deleted node with value %d.\n", key);
     free(temp);
 }
-
-/* ===================== DISPLAY ===================== */
-
-// Display forward
 void displayForward() {
     if (head == NULL) {
         printf("List empty!\n");
@@ -121,14 +106,13 @@ void displayForward() {
     printf("\n");
 }
 
-// Display backward
 void displayBackward() {
     if (head == NULL) {
         printf("List empty!\n");
         return;
     }
     struct Node* temp = head;
-    while (temp->next != NULL) temp = temp->next; // move to last
+    while (temp->next != NULL) temp = temp->next; 
     printf("List (Backward): ");
     while (temp != NULL) {
         printf("%d ", temp->data);
@@ -136,8 +120,6 @@ void displayBackward() {
     }
     printf("\n");
 }
-
-/* ===================== MAIN MENU ===================== */
 
 int main() {
     int choice, subChoice, data, key;
@@ -152,7 +134,7 @@ int main() {
         scanf("%d", &choice);
 
         switch (choice) {
-        case 1: // Insertion submenu
+        case 1: 
             while (1) {
                 printf("\n-- Insertion Menu --\n");
                 printf("1. Insert at Beginning\n");
@@ -163,30 +145,42 @@ int main() {
                 printf("Enter your choice: ");
                 scanf("%d", &subChoice);
 
-                if (subChoice == 1) {
+                switch (subChoice) {
+                case 1:
                     printf("Enter data: ");
                     scanf("%d", &data);
                     insertAtBeginning(data);
-                }
-                else if (subChoice == 2) {
+                    break;
+                
+                case 2: 
                     printf("Enter data: ");
                     scanf("%d", &data);
                     insertAtEnd(data);
-                }
-                else if (subChoice == 3) {
+                    break;
+                
+                case 3: 
                     printf("Enter key: ");
                     scanf("%d", &key);
                     printf("Enter data: ");
                     scanf("%d", &data);
                     insertAfter(key, data);
-                }
-                else if (subChoice == 4) break; // go back
-                else if (subChoice == 5) exit(0);
-                else printf("Invalid choice!\n");
-            }
-            break;
+                    break;
+                
+               	case 4:
+               	main();
+               	break;
+               	 
+               	case 5:
+               	exit(0);
+               	break;
+               	
+                default:
+                printf("Invalid choice!\n");
+            	break;
+            	
+            }}break;
 
-        case 2: // Deletion submenu
+        case 2: 
             while (1) {
                 printf("\n-- Deletion Menu --\n");
                 printf("1. Delete at Beginning\n");
@@ -196,21 +190,32 @@ int main() {
                 printf("5. Exit\n");
                 printf("Enter your choice: ");
                 scanf("%d", &subChoice);
+                
+                switch (subChoice){
 
-                if (subChoice == 1) deleteAtBeginning();
-                else if (subChoice == 2) deleteAtEnd();
-                else if (subChoice == 3) {
+                case 1:
+                deleteAtBeginning();
+                break;
+              	case 2:
+              	deleteAtEnd();
+              	break;
+                case 3:
                     printf("Enter key: ");
                     scanf("%d", &key);
                     deleteNode(key);
-                }
-                else if (subChoice == 4) break; // go back
-                else if (subChoice == 5) exit(0);
-                else printf("Invalid choice!\n");
-            }
-            break;
+                	break;
+                case 4:
+                main();
+                break; 
+                case 5:
+                 exit(0);
+                 break;
+                default :
+                printf("Invalid choice!\n");
+        	     break;
+        	     }}break;
 
-        case 3: // Display submenu
+        case 3: 
             while (1) {
                 printf("\n-- Display Menu --\n");
                 printf("1. Forward\n");
@@ -219,21 +224,34 @@ int main() {
                 printf("4. Exit\n");
                 printf("Enter your choice: ");
                 scanf("%d", &subChoice);
-
-                if (subChoice == 1) displayForward();
-                else if (subChoice == 2) displayBackward();
-                else if (subChoice == 3) break; // go back
-                else if (subChoice == 4) exit(0);
-                else printf("Invalid choice!\n");
-            }
-            break;
+                
+		switch (subChoice) {
+                case 1:
+                 displayForward();
+                 break;
+                 
+                case 2:
+                 displayBackward();
+                 break;
+                case 3:
+                main();
+                 break; 
+                case 4:
+                 exit(0);
+                 break;
+                default:
+                 printf("Invalid choice!\n");
+            
+            break;}}break;
 
         case 4:
             printf("Exiting program...\n");
             exit(0);
+            break;
 
         default:
             printf("Invalid choice!\n");
+            break;
         }
     }
     return 0;
