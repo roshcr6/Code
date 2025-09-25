@@ -1,29 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 struct Node {
     int data;
     struct Node *prev, *next;
 };
-
 struct Node* head = NULL;
-
 struct Node* createNode(int data) {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
     newNode->data = data;
     newNode->prev = newNode->next = NULL;
-    return newNode;
-}
+    return newNode;}
 
 void insertAtBeginning(int data) {
     struct Node* newNode = createNode(data);
     if (head != NULL) {
         newNode->next = head;
-        head->prev = newNode;
-    }
+        head->prev = newNode;}
     head = newNode;
-    printf("Inserted %d at beginning.\n", data);
-}
+    printf("Inserted %d at beginning.\n", data);}
 
 void insertAtEnd(int data) {
     struct Node* newNode = createNode(data);
@@ -35,95 +29,78 @@ void insertAtEnd(int data) {
         temp->next = newNode;
         newNode->prev = temp;
     }
-    printf("Inserted %d at end.\n", data);
-}
+    printf("Inserted %d at end.\n", data);}
 
 void insertAfter(int key, int data) {
     struct Node* temp = head;
     while (temp != NULL && temp->data != key) temp = temp->next;
     if (temp == NULL) {
         printf("Node %d not found!\n", key);
-        return;
-    }
+        return;}
     struct Node* newNode = createNode(data);
     newNode->next = temp->next;
     if (temp->next != NULL) temp->next->prev = newNode;
     temp->next = newNode;
     newNode->prev = temp;
-    printf("Inserted %d after %d.\n", data, key);
-}
+    printf("Inserted %d after %d.\n", data, key);}
 
 void deleteAtBeginning() {
     if (head == NULL) {
         printf("List empty!\n");
         return;
-    }
-    struct Node* temp = head;
-    head = head->next;
-    if (head != NULL) head->prev = NULL;
-    printf("Deleted %d from beginning.\n", temp->data);
-    free(temp);
-}
+    }struct Node* temp = head;
+     head = head->next;
+     if (head != NULL) head->prev = NULL;
+     printf("Deleted %d from beginning.\n", temp->data);
+     free(temp);}
 
 void deleteAtEnd() {
     if (head == NULL) {
         printf("List empty!\n");
-        return;
-    }
+        return;}
     struct Node* temp = head;
     while (temp->next != NULL) temp = temp->next;
     if (temp->prev != NULL) temp->prev->next = NULL;
     else head = NULL;
     printf("Deleted %d from end.\n", temp->data);
-    free(temp);
-}
+    free(temp);}
 
 void deleteNode(int key) {
     struct Node* temp = head;
     while (temp != NULL && temp->data != key) temp = temp->next;
     if (temp == NULL) {
         printf("Node %d not found!\n", key);
-        return;
-    }
+        return;}
     if (temp->prev != NULL) temp->prev->next = temp->next;
     else head = temp->next;
     if (temp->next != NULL) temp->next->prev = temp->prev;
     printf("Deleted node with value %d.\n", key);
-    free(temp);
-}
+    free(temp);}
 
 void displayForward() {
     if (head == NULL) {
         printf("List empty!\n");
-        return;
-    }
+        return;}
     struct Node* temp = head;
     printf("List (Forward): ");
     while (temp != NULL) {
         printf("%d ", temp->data);
-        temp = temp->next;
-    }
-    printf("\n");
-}
+        temp = temp->next;}printf("\n");}
 
 void displayBackward() {
     if (head == NULL) {
         printf("List empty!\n");
-        return;
-    }
+        return;}
     struct Node* temp = head;
     while (temp->next != NULL) temp = temp->next;
     printf("List (Backward): ");
     while (temp != NULL) {
         printf("%d ", temp->data);
         temp = temp->prev;
-    }
-    printf("\n");
-}
+    }printf("\n");}
 
 int main() {
     int choice, subChoice, data, key;
-
     while (1) {
         printf("\n=== MAIN MENU ===\n");
         printf("1. Insertion\n");
@@ -189,7 +166,7 @@ int main() {
                     printf("Invalid choice!\n");
             }
             break;
-
+            
         case 3:
             printf("\n-- Display Menu --\n");
             printf("1. Forward\n");
@@ -215,7 +192,5 @@ int main() {
 
         default:
             printf("Invalid choice!\n");
-        }
-    }
-    return 0;
-}
+        }}
+    return 0;}
