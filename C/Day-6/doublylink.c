@@ -52,6 +52,7 @@ void insertAfter(int key, int data) {
     newNode->prev = temp;
     printf("Inserted %d after %d.\n", data, key);
 }
+
 void deleteAtBeginning() {
     if (head == NULL) {
         printf("List empty!\n");
@@ -64,7 +65,6 @@ void deleteAtBeginning() {
     free(temp);
 }
 
-
 void deleteAtEnd() {
     if (head == NULL) {
         printf("List empty!\n");
@@ -73,11 +73,10 @@ void deleteAtEnd() {
     struct Node* temp = head;
     while (temp->next != NULL) temp = temp->next;
     if (temp->prev != NULL) temp->prev->next = NULL;
-    else head = NULL; 
+    else head = NULL;
     printf("Deleted %d from end.\n", temp->data);
     free(temp);
 }
-
 
 void deleteNode(int key) {
     struct Node* temp = head;
@@ -92,6 +91,7 @@ void deleteNode(int key) {
     printf("Deleted node with value %d.\n", key);
     free(temp);
 }
+
 void displayForward() {
     if (head == NULL) {
         printf("List empty!\n");
@@ -112,7 +112,7 @@ void displayBackward() {
         return;
     }
     struct Node* temp = head;
-    while (temp->next != NULL) temp = temp->next; 
+    while (temp->next != NULL) temp = temp->next;
     printf("List (Backward): ");
     while (temp != NULL) {
         printf("%d ", temp->data);
@@ -134,124 +134,87 @@ int main() {
         scanf("%d", &choice);
 
         switch (choice) {
-        case 1: 
-            while (1) {
-                printf("\n-- Insertion Menu --\n");
-                printf("1. Insert at Beginning\n");
-                printf("2. Insert at End\n");
-                printf("3. Insert After a Node\n");
-                printf("4. Go Back\n");
-                printf("5. Exit\n");
-                printf("Enter your choice: ");
-                scanf("%d", &subChoice);
+        case 1:
+            printf("\n-- Insertion Menu --\n");
+            printf("1. Insert at Beginning\n");
+            printf("2. Insert at End\n");
+            printf("3. Insert After a Node\n");
+            printf("Enter your choice: ");
+            scanf("%d", &subChoice);
 
-                switch (subChoice) {
+            switch (subChoice) {
                 case 1:
                     printf("Enter data: ");
                     scanf("%d", &data);
                     insertAtBeginning(data);
                     break;
-                
-                case 2: 
+                case 2:
                     printf("Enter data: ");
                     scanf("%d", &data);
                     insertAtEnd(data);
                     break;
-                
-                case 3: 
+                case 3:
                     printf("Enter key: ");
                     scanf("%d", &key);
                     printf("Enter data: ");
                     scanf("%d", &data);
                     insertAfter(key, data);
                     break;
-                
-               	case 4:
-               	main();
-               	break;
-               	 
-               	case 5:
-               	exit(0);
-               	break;
-               	
                 default:
-                printf("Invalid choice!\n");
-            	break;
-            	
-            }}break;
+                    printf("Invalid choice!\n");
+            }
+            break;
 
-        case 2: 
-            while (1) {
-                printf("\n-- Deletion Menu --\n");
-                printf("1. Delete at Beginning\n");
-                printf("2. Delete at End\n");
-                printf("3. Delete Specific Node\n");
-                printf("4. Go Back\n");
-                printf("5. Exit\n");
-                printf("Enter your choice: ");
-                scanf("%d", &subChoice);
-                
-                switch (subChoice){
+        case 2:
+            printf("\n-- Deletion Menu --\n");
+            printf("1. Delete at Beginning\n");
+            printf("2. Delete at End\n");
+            printf("3. Delete Specific Node\n");
+            printf("Enter your choice: ");
+            scanf("%d", &subChoice);
 
+            switch (subChoice) {
                 case 1:
-                deleteAtBeginning();
-                break;
-              	case 2:
-              	deleteAtEnd();
-              	break;
+                    deleteAtBeginning();
+                    break;
+                case 2:
+                    deleteAtEnd();
+                    break;
                 case 3:
                     printf("Enter key: ");
                     scanf("%d", &key);
                     deleteNode(key);
-                	break;
-                case 4:
-                main();
-                break; 
-                case 5:
-                 exit(0);
-                 break;
-                default :
-                printf("Invalid choice!\n");
-        	     break;
-        	     }}break;
-
-        case 3: 
-            while (1) {
-                printf("\n-- Display Menu --\n");
-                printf("1. Forward\n");
-                printf("2. Backward\n");
-                printf("3. Go Back\n");
-                printf("4. Exit\n");
-                printf("Enter your choice: ");
-                scanf("%d", &subChoice);
-                
-		switch (subChoice) {
-                case 1:
-                 displayForward();
-                 break;
-                 
-                case 2:
-                 displayBackward();
-                 break;
-                case 3:
-                main();
-                 break; 
-                case 4:
-                 exit(0);
-                 break;
+                    break;
                 default:
-                 printf("Invalid choice!\n");
-            
-            break;}}break;
+                    printf("Invalid choice!\n");
+            }
+            break;
+
+        case 3:
+            printf("\n-- Display Menu --\n");
+            printf("1. Forward\n");
+            printf("2. Backward\n");
+            printf("Enter your choice: ");
+            scanf("%d", &subChoice);
+
+            switch (subChoice) {
+                case 1:
+                    displayForward();
+                    break;
+                case 2:
+                    displayBackward();
+                    break;
+                default:
+                    printf("Invalid choice!\n");
+            }
+            break;
 
         case 4:
             printf("Exiting program...\n");
             exit(0);
-            break;
 
         default:
             printf("Invalid choice!\n");
-            break;
         }
     }
     return 0;
