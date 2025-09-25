@@ -1,17 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 struct Node {
     int data;
-    struct Node *left, *right;
-};
+    struct Node *left, *right;};
 
 struct Node* createNode(int data) {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
     newNode->data = data;
     newNode->left = newNode->right = NULL;
-    return newNode;
-}
+    return newNode;}
 
 struct Node* insert(struct Node* root, int data) {
     if (root == NULL) return createNode(data);
@@ -19,25 +16,21 @@ struct Node* insert(struct Node* root, int data) {
         root->left = insert(root->left, data);
     else if (data > root->data)
         root->right = insert(root->right, data);
-    return root;
-}
+    return root;}
 
 struct Node* minValueNode(struct Node* node) {
     struct Node* current = node;
     while (current && current->left != NULL)
         current = current->left;
-    return current;
-}
+    return current;}
 
 struct Node* deleteNode(struct Node* root, int key) {
     if (root == NULL) return root;
-
     if (key < root->data)
         root->left = deleteNode(root->left, key);
     else if (key > root->data)
         root->right = deleteNode(root->right, key);
-    else {
-        if (root->left == NULL) {
+    else {if (root->left == NULL) {
             struct Node* temp = root->right;
             free(root);
             return temp;
@@ -49,33 +42,25 @@ struct Node* deleteNode(struct Node* root, int key) {
         struct Node* temp = minValueNode(root->right);
         root->data = temp->data;
         root->right = deleteNode(root->right, temp->data);
-    }
-    return root;
-}
+    }return root;}
 
 void inorder(struct Node* root) {
     if (root != NULL) {
         inorder(root->left);
         printf("%d ", root->data);
-        inorder(root->right);
-    }
-}
+        inorder(root->right);}}
 
 void preorder(struct Node* root) {
     if (root != NULL) {
         printf("%d ", root->data);
         preorder(root->left);
-        preorder(root->right);
-    }
-}
+        preorder(root->right);}}
 
 void postorder(struct Node* root) {
     if (root != NULL) {
         postorder(root->left);
         postorder(root->right);
-        printf("%d ", root->data);
-    }
-}
+        printf("%d ", root->data);}}
 
 struct Node* search(struct Node* root, int key) {
     if (root == NULL || root->data == key)
@@ -88,7 +73,6 @@ struct Node* search(struct Node* root, int key) {
 int main() {
     struct Node* root = NULL;
     int choice, data;
-
     while (1) {
         printf("\n=== BST MENU ===\n");
         printf("1. Insert\n");
@@ -100,7 +84,6 @@ int main() {
         printf("7. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
-
         switch (choice) {
         case 1:
             printf("Enter value to insert: ");
@@ -140,7 +123,4 @@ int main() {
             exit(0);
         default:
             printf("Invalid choice!\n");
-        }
-    }
-    return 0;
-}
+        }}return 0;}
