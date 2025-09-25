@@ -1,14 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 struct Node {
     int data;
     int priority;
-    struct Node* next;
-};
+    struct Node* next;};
 
 struct Node* front = NULL;
-
 struct Node* createNode(int data, int priority) {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
     newNode->data = data;
@@ -19,49 +16,39 @@ struct Node* createNode(int data, int priority) {
 
 void enqueue(int data, int priority) {
     struct Node* newNode = createNode(data, priority);
-
     if (front == NULL || priority < front->priority) {
         newNode->next = front;
         front = newNode;
     } else {
         struct Node* temp = front;
         while (temp->next != NULL && temp->next->priority <= priority) {
-            temp = temp->next;
-        }
+            temp = temp->next;}
         newNode->next = temp->next;
         temp->next = newNode;
-    }
-    printf("Inserted element %d with priority %d\n", data, priority);
-}
+    }printf("Inserted element %d with priority %d\n", data, priority);}
 
 void dequeue() {
     if (front == NULL) {
         printf("Priority Queue is empty. Nothing to delete.\n");
-        return;
-    }
+        return;}
     struct Node* temp = front;
     printf("Deleted element %d with priority %d\n", temp->data, temp->priority);
     front = front->next;
-    free(temp);
-}
+    free(temp);}
 
 void display() {
     if (front == NULL) {
         printf("Priority Queue is empty.\n");
-        return;
-    }
+        return;}
     struct Node* temp = front;
     printf("Priority Queue (data:priority): ");
     while (temp != NULL) {
         printf("%d:%d ", temp->data, temp->priority);
         temp = temp->next;
-    }
-    printf("\n");
-}
+    }printf("\n");}
 
 int main() {
     int choice, data, priority;
-
     while (1) {
         printf("\n===== PRIORITY QUEUE MENU =====\n");
         printf("1. Add an element\n");
@@ -71,7 +58,6 @@ int main() {
         printf("================================\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
-
         switch (choice) {
             case 1:
                 printf("Enter value: ");
@@ -91,8 +77,4 @@ int main() {
                 exit(0);
             default:
                 printf("Invalid choice! Try again.\n");
-        }
-    }
-    return 0;
-}
-
+        }}return 0;}
