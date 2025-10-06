@@ -1,47 +1,56 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
-public class PerfectNumberChecker extends JFrame implements ActionListener {
-    JTextField inputField, resultField;
-    JButton checkBtn;
+public class PerfectNumberChecker extends Application {
 
-    public PerfectNumberChecker() {
-        setTitle("Perfect Number Checker");
-        setSize(350, 150);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(3, 2));
+    @Override
+    public void start(Stage stage) {
+        stage.setTitle("Perfect Number Checker");
 
-        inputField = new JTextField();
-        resultField = new JTextField();
+        Label l1 = new Label("Enter Number:");
+        TextField inputField = new TextField();
+
+        Label l2 = new Label("Result:");
+        TextField resultField = new TextField();
         resultField.setEditable(false);
-        checkBtn = new JButton("Check");
 
-        add(new JLabel("Enter Number:"));
-        add(inputField);
-        add(new JLabel("Result:"));
-        add(resultField);
-        add(new JLabel());
-        add(checkBtn);
+        Button checkBtn = new Button("Check");
 
-        checkBtn.addActionListener(this);
-    }
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(15));
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.add(l1, 0, 0);
+        grid.add(inputField, 1, 0);
+        grid.add(l2, 0, 1);
+        grid.add(resultField, 1, 1);
+        grid.add(checkBtn, 1, 2);
 
-    public void actionPerformed(ActionEvent e) {
-        try {
-            int num = Integer.parseInt(inputField.getText());
-            if (num <= 0) {
-                resultField.setText("Enter a positive number");
-                return;
+
+        checkBtn.setOnAction(e -> {
+            try {
+                int num = Integer.parseInt(inputField.getText());
+                if (num <= 0) {
+                    resultField.setText("Enter a positive number");
+                    return;
+                }
+                if (isPerfect(num)) {
+                    resultField.setText(num + " is a perfect number");
+                } else {
+                    resultField.setText("Sum of digits: " + sumDigits(num));
+                }
+            } catch (NumberFormatException ex) {
+                resultField.setText("Invalid Input");
             }
-            if (isPerfect(num)) {
-                resultField.setText(num + " is a perfect number");
-            } else {
-                resultField.setText("Sum of digits: " + sumDigits(num));
-            }
-        } catch (NumberFormatException ex) {
-            resultField.setText("Invalid Input");
-        }
+        });
+
+        Scene scene = new Scene(grid, 350, 150);
+        stage.setScene(scene);
+        stage.show();
     }
 
     private boolean isPerfect(int n) {
@@ -62,6 +71,8 @@ public class PerfectNumberChecker extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
-        new PerfectNumberChecker().setVisible(true);
+        launch(args);
     }
 }
+
+    //java --module-path /home/s3csd/Downloads/openjfx-21.0.8_linux-x64_bin-sdk/javafx-sdk-21.0.8/lib --add-modules javafx.controls PerfectNumberChecker.java
