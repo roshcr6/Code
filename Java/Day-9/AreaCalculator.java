@@ -1,68 +1,86 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
-public class AreaCalculator extends JFrame implements ActionListener {
-    private JComboBox<String> shapeList;
-    private JTextField tf1, tf2, resultField;
-    private JLabel l1, l2;
-    private JButton calculateBtn;
+public class AreaCalculator extends Application {
 
-    public AreaCalculator() {
-        setTitle("Area Calculator");
-        setSize(350, 200);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(5, 2));
+    private ComboBox<String> shapeList;
+    private TextField tf1, tf2, resultField;
+    private Label l1, l2;
 
-        shapeList = new JComboBox<>(new String[]{"Circle", "Rectangle", "Triangle"});
-        l1 = new JLabel("Value 1:");
-        l2 = new JLabel("Value 2:");
-        tf1 = new JTextField();
-        tf2 = new JTextField();
-        resultField = new JTextField();
-        resultField.setEditable(false);
-        calculateBtn = new JButton("Calculate");
-        
-        add(new JLabel("Shape:"));
-        add(shapeList);
-        add(l1);
-        add(tf1);
-        add(l2);
-        add(tf2);
-        add(new JLabel(""));
-        add(calculateBtn);
-        add(new JLabel("Area:"));
-        add(resultField);
+    @Override
+    public void start(Stage stage) {
+        stage.setTitle("Area Calculator");
 
-        shapeList.addActionListener(this);
-        calculateBtn.addActionListener(this);
+        shapeList = new ComboBox<>();
+        shapeList.getItems().addAll("Circle", "Rectangle", "Triangle");
+        shapeList.setValue("Circle");
+
+        l1 = new Label("Radius:");
+        l2 = new Label("Value 2:");
+        tf1 = new TextField();
+        tf2 = new TextField();
         tf2.setVisible(false);
         l2.setVisible(false);
-    }
 
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == shapeList) {
-            String shape = (String) shapeList.getSelectedItem();
-            if (shape.equals("Circle")) {
-                l1.setText("Radius:");
-                l2.setVisible(false);
-                tf2.setVisible(false);
-            } else if (shape.equals("Rectangle")) {
-                l1.setText("Length:");
-                l2.setText("Breadth:");
-                l2.setVisible(true);
-                tf2.setVisible(true);
-            } else {
-                l1.setText("Base:");
-                l2.setText("Height:");
-                l2.setVisible(true);
-                tf2.setVisible(true);
+        resultField = new TextField();
+        resultField.setEditable(false);
+
+        Button calculateBtn = new Button("Calculate");
+        Button clearBtn = new Button("Clear");
+
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(15));
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        grid.add(new Label("Shape:"), 0, 0);
+        grid.add(shapeList, 1, 0);
+        grid.add(l1, 0, 1);
+        grid.add(tf1, 1, 1);
+        grid.add(l2, 0, 2);
+        grid.add(tf2, 1, 2);
+        grid.add(calculateBtn, 0, 3);
+        grid.add(clearBtn, 1, 3);
+        grid.add(new Label("Area:"), 0, 4);
+        grid.add(resultField, 1, 4);
+
+        shapeList.setOnAction(e -> {
+            String shape = shapeList.getValue();
+            switch (shape) {
+                case "Circle" -> {
+                    l1.setText("Radius:");
+                    l2.setVisible(false);
+                    tf2.setVisible(false);
+                }
+                case "Rectangle" -> {
+                    l1.setText("Length:");
+                    l2.setText("Breadth:");
+                    l2.setVisible(true);
+                    tf2.setVisible(true);
+                }
+                case "Triangle" -> {
+                    l1.setText("Base:");
+                    l2.setText("Height:");
+                    l2.setVisible(true);
+                    tf2.setVisible(true);
+                }
             }
-        } else if (e.getSource() == calculateBtn) {
+            tf1.clear();
+            tf2.clear();
+            resultField.clear();
+        });
+
+        calculateBtn.setOnAction(e -> {
             try {
-                String shape = (String) shapeList.getSelectedItem();
+                String shape = shapeList.getValue();
                 double v1 = Double.parseDouble(tf1.getText());
                 double area = 0;
+
                 if (shape.equals("Circle")) {
                     area = Math.PI * v1 * v1;
                 } else {
@@ -73,16 +91,29 @@ public class AreaCalculator extends JFrame implements ActionListener {
                         area = 0.5 * v1 * v2;
                     }
                 }
-                resultField.setText(String.valueOf(area));
+
+                resultField.setText(String.format("%.2f", area));
             } catch (NumberFormatException ex) {
                 resultField.setText("Invalid Input");
             } catch (Exception ex) {
                 resultField.setText("Error: " + ex.getMessage());
             }
-        }
+        });
+
+
+        clearBtn.setOnAction(e -> {
+            tf1.clear();
+            tf2.clear();
+            resultField.clear();
+        });
+
+        Scene scene = new Scene(grid, 350, 250);
+        stage.setScene(scene);
+        stage.show();
     }
 
     public static void main(String[] args) {
-        new AreaCalculator().setVisible(true);
+        launch(args);
     }
 }
+//javac --module-path /home/s3csd/Downloads/openjfx-21.0.8_linux-x64_bin-sdk/javafx-sdk-21.0.8/lib --add-modules javafx.controls AreaCalculator.java
