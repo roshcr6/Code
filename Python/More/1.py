@@ -1,0 +1,5 @@
+principle=float(input("Amount : "))
+interest=float(input("Interest Rate : "))
+year=int(input("Number of Years : "))
+print(f"Simple Interest Amount = {(principle*interest*year)/100}")
+print(f"Compound Interest Amount = {principle*(1+interest/100)**year}")
