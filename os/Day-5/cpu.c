@@ -1,17 +1,14 @@
 #include <stdio.h>
 
-int n;
 int AT[10], BT[10], PR[10];
 int CT[10], TAT[10], WT[10];
-int done[10];
+int n;
 
+/* Common function to print table */
 void printTable() {
     float avgTAT = 0, avgWT = 0;
 
-    printf("\n-------------------------------------------------\n");
-    printf("Process\tAT\tBT\tCT\tTAT\tWT\n");
-    printf("-------------------------------------------------\n");
-
+    printf("\nProcess\tAT\tBT\tCT\tTAT\tWT\n");
     for(int i = 0; i < n; i++) {
         TAT[i] = CT[i] - AT[i];
         WT[i]  = TAT[i] - BT[i];
@@ -22,12 +19,11 @@ void printTable() {
                i+1, AT[i], BT[i], CT[i], TAT[i], WT[i]);
     }
 
-    printf("-------------------------------------------------\n");
     printf("Average Turnaround Time = %.2f\n", avgTAT / n);
     printf("Average Waiting Time    = %.2f\n", avgWT / n);
 }
 
-/* FCFS */
+/* FCFS Scheduling */
 void fcfs() {
     int time = 0;
 
@@ -42,10 +38,8 @@ void fcfs() {
 
 /* SJF (Non-Preemptive) */
 void sjf() {
+    int done[10] = {0};
     int time = 0, completed = 0;
-
-    for(int i = 0; i < n; i++)
-        done[i] = 0;
 
     while(completed < n) {
         int idx = -1, minBT = 9999;
@@ -70,12 +64,10 @@ void sjf() {
     printTable();
 }
 
-/* Priority (Non-Preemptive) */
+/* Priority Scheduling (Non-Preemptive) */
 void priority() {
+    int done[10] = {0};
     int time = 0, completed = 0;
-
-    for(int i = 0; i < n; i++)
-        done[i] = 0;
 
     while(completed < n) {
         int idx = -1, minPR = 9999;
@@ -100,7 +92,7 @@ void priority() {
     printTable();
 }
 
-/* Round Robin (Pre-emptive) */
+/* Round Robin Scheduling */
 void roundRobin() {
     int tq, rem[10];
     int time = 0, completed = 0;
@@ -132,32 +124,34 @@ void roundRobin() {
 int main() {
     int choice;
 
-    printf("Enter number of processes: ");
-    scanf("%d", &n);
-
-    for(int i = 0; i < n; i++) {
-        printf("Enter Arrival Time, Burst Time and Priority for P%d: ", i+1);
-        scanf("%d %d %d", &AT[i], &BT[i], &PR[i]);
-    }
-
     do {
-        printf("\n--- CPU Scheduling Menu ---\n");
-        printf("1. FCFS\n");
-        printf("2. SJF (Non-Preemptive)\n");
-        printf("3. Round Robin (Pre-emptive)\n");
-        printf("4. Priority (Non-Preemptive)\n");
-        printf("5. Exit\n");
-        printf("Enter your choice: ");
+        printf("\n--- CPU Scheduling Menu ---\n1. FCFS\n2. SJF (Non-Preemptive)\n3. Round Robin (Pre-emptive)\n4. Priority (Non-Preemptive)\n5. Exit\nEnter your choice: ");
         scanf("%d", &choice);
+
+        if(choice >= 1 && choice <= 4) {
+            printf("Enter number of processes: ");
+            scanf("%d", &n);
+
+            for(int i = 0; i < n; i++) {
+                if(choice == 4) {
+                    printf("Enter AT, BT and Priority for P%d: ", i+1);
+                    scanf("%d %d %d", &AT[i], &BT[i], &PR[i]);
+                } else {
+                    printf("Enter AT and BT for P%d: ", i+1);
+                    scanf("%d %d", &AT[i], &BT[i]);
+                }
+            }
+        }
 
         switch(choice) {
             case 1: fcfs(); break;
             case 2: sjf(); break;
             case 3: roundRobin(); break;
             case 4: priority(); break;
-            case 5: break;
+            case 5: printf("Exiting program\n"); break;
             default: printf("Invalid choice\n");
         }
+
     } while(choice != 5);
 
     return 0;
