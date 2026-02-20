@@ -8,166 +8,168 @@
  * The program calculates page faults and hit ratio for performance evaluation.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#include <stdio.h>      // For input/output functions like printf, scanf
+#include <stdlib.h>     // For exit() function
+#include <stdbool.h>    // For bool, true, false data types
 
-#define MAX_PAGES 50
-#define MAX_FRAMES 10
+#define MAX_PAGES 50    // Maximum number of pages in reference string
+#define MAX_FRAMES 10   // Maximum number of frames in memory
 
-// Function to check if page is in frame
-int searchPage(int page, int frames[], int numFrames) {
-    for (int i = 0; i < numFrames; i++) {
-        if (frames[i] == page) {
-            return i; // Return position if found
+// Function to check if a page is already present in frames (searching for page hit)
+int searchPage(int page, int frames[], int numFrames) {  // Takes page number, frame array, and frame count
+    for (int i = 0; i < numFrames; i++) {  // Loop through all frames
+        if (frames[i] == page) {            // If page found in frame i
+            return i;                       // Return position/index where found
         }
     }
-    return -1; // Not found
+    return -1;                              // Return -1 if page not found (page fault)
 }
 
-// Function to display current frame status
-void displayFrames(int frames[], int numFrames) {
-    printf("| ");
-    for (int i = 0; i < numFrames; i++) {
-        if (frames[i] == -1) {
-            printf("  - ");
-        } else {
-            printf(" %2d ", frames[i]);
+// Function to display current state of all frames in a formatted way
+void displayFrames(int frames[], int numFrames) {  // Takes frame array and frame count
+    printf("| ");                          // Print left border
+    for (int i = 0; i < numFrames; i++) {  // Loop through all frames
+        if (frames[i] == -1) {             // If frame is empty (-1 indicates empty)
+            printf("  - ");                // Display dash for empty frame
+        } else {                           // If frame contains a page
+            printf(" %2d ", frames[i]);    // Display page number (right-aligned, 2 digits)
         }
     }
-    printf("|");
+    printf("|");                           // Print right border
 }
 
-// FIFO Page Replacement Algorithm
-void fifo(int pages[], int numPages, int numFrames) {
-    int frames[MAX_FRAMES];
-    int pageFaults = 0;
-    int pageHits = 0;
-    int nextReplace = 0; // Index for next frame to replace
+// FIFO Page Replacement Algorithm - Replace oldest page in memory
+void fifo(int pages[], int numPages, int numFrames) {  // Takes page reference string, page count, frame count
+    int frames[MAX_FRAMES];              // Array to store current pages in frames
+    int pageFaults = 0;                  // Counter for page faults
+    int pageHits = 0;                    // Counter for page hits
+    int nextReplace = 0;                 // Index of next frame to replace (circular queue pointer)
     
-    // Initialize frames to -1 (empty)
-    for (int i = 0; i < numFrames; i++) {
-        frames[i] = -1;
+    // Initialize all frames to -1 (indicating empty frames)
+    for (int i = 0; i < numFrames; i++) {  // Loop through all frames
+        frames[i] = -1;                  // Set frame to empty
     }
     
-    printf("\n========================================\n");
-    printf("    FIFO PAGE REPLACEMENT SIMULATION\n");
-    printf("========================================\n");
-    printf("Number of Frames: %d\n", numFrames);
-    printf("========================================\n");
-    printf("Page | Frames               | Status\n");
-    printf("----------------------------------------\n");
+    printf("\n========================================\n");  // Display header separator
+    printf("    FIFO PAGE REPLACEMENT SIMULATION\n");       // Display algorithm name
+    printf("========================================\n");    // Display separator
+    printf("Number of Frames: %d\n", numFrames);            // Display frame count
+    printf("========================================\n");    // Display separator
+    printf("Page | Frames               | Status\n");       // Display column headers
+    printf("----------------------------------------\n");   // Display column separator
     
-    for (int i = 0; i < numPages; i++) {
-        int currentPage = pages[i];
-        printf(" %2d  ", currentPage);
+    for (int i = 0; i < numPages; i++) {  // Loop through each page in reference string
+        int currentPage = pages[i];      // Get current page number
+        printf(" %2d  ", currentPage);   // Display current page number
         
-        // Check if page is already in frame
-        int position = searchPage(currentPage, frames, numFrames);
+        // Check if page is already present in a frame (page hit check)
+        int position = searchPage(currentPage, frames, numFrames);  // Search for page
         
-        if (position != -1) {
-            // Page Hit
-            displayFrames(frames, numFrames);
-            printf(" HIT\n");
-            pageHits++;
-        } else {
-            // Page Fault
-            frames[nextReplace] = currentPage;
-            displayFrames(frames, numFrames);
-            printf(" FAULT\n");
-            pageFaults++;
+        if (position != -1) {            // If page found in frames (page hit)
+            displayFrames(frames, numFrames);  // Display current frame state
+            printf(" HIT\n");            // Display "HIT" status
+            pageHits++;                  // Increment hit counter
+        } else {                         // If page not found (page fault)
+            frames[nextReplace] = currentPage;  // Place page in next frame position
+            displayFrames(frames, numFrames);   // Display updated frame state
+            printf(" FAULT\n");          // Display "FAULT" status
+            pageFaults++;                // Increment fault counter
             
-            // Move to next frame (circular)
-            nextReplace = (nextReplace + 1) % numFrames;
+            // Move to next frame in circular fashion (FIFO behavior)
+            nextReplace = (nextReplace + 1) % numFrames;  // Wrap around using modulo
         }
     }
     
-    printf("========================================\n");
-    printf("RESULTS:\n");
-    printf("Total Page References: %d\n", numPages);
-    printf("Page Faults: %d\n", pageFaults);
-    printf("Page Hits: %d\n", pageHits);
-    printf("Hit Ratio: %.2f%%\n", (pageHits * 100.0) / numPages);
-    printf("Fault Ratio: %.2f%%\n", (pageFaults * 100.0) / numPages);
-    printf("========================================\n");
+    printf("========================================\n");  // Display results separator
+    printf("RESULTS:\n");                                 // Display results header
+    printf("Total Page References: %d\n", numPages);     // Display total pages processed
+    printf("Page Faults: %d\n", pageFaults);             // Display total page faults
+    printf("Page Hits: %d\n", pageHits);                 // Display total page hits
+    printf("Hit Ratio: %.2f%%\n", (pageHits * 100.0) / numPages);      // Calculate and display hit percentage
+    printf("Fault Ratio: %.2f%%\n", (pageFaults * 100.0) / numPages);  // Calculate and display fault percentage
+    printf("========================================\n");  // Display end separator
 }
 
-// LRU Page Replacement Algorithm
-void lru(int pages[], int numPages, int numFrames) {
-    int frames[MAX_FRAMES];
-    int lastUsed[MAX_FRAMES]; // Track when each frame was last used
-    int pageFaults = 0;
-    int pageHits = 0;
-    int time = 0;
+// LRU Page Replacement Algorithm - Replace least recently used page
+void lru(int pages[], int numPages, int numFrames) {  // Takes page reference string, page count, frame count
+    int frames[MAX_FRAMES];              // Array to store current pages in frames
+    int lastUsed[MAX_FRAMES];            // Array to track when each frame was last accessed (timestamp)
+    int pageFaults = 0;                  // Counter for page faults
+    int pageHits = 0;                    // Counter for page hits
+    int time = 0;                        // Time counter (increments with each page reference)
     
-    // Initialize frames to -1 (empty) and lastUsed to 0
-    for (int i = 0; i < numFrames; i++) {
-        frames[i] = -1;
-        lastUsed[i] = 0;
+    // Initialize all frames to -1 (empty) and lastUsed to 0 (never used)
+    for (int i = 0; i < numFrames; i++) {  // Loop through all frames
+        frames[i] = -1;                  // Set frame to empty
+        lastUsed[i] = 0;                 // Set last used time to 0
     }
     
-    printf("\n========================================\n");
-    printf("    LRU PAGE REPLACEMENT SIMULATION\n");
-    printf("========================================\n");
-    printf("Number of Frames: %d\n", numFrames);
-    printf("========================================\n");
-    printf("Page | Frames               | Status\n");
-    printf("----------------------------------------\n");
+    printf("\n========================================\n");  // Display header separator
+    printf("    LRU PAGE REPLACEMENT SIMULATION\n");        // Display algorithm name
+    printf("========================================\n");    // Display separator
+    printf("Number of Frames: %d\n", numFrames);            // Display frame count
+    printf("========================================\n");    // Display separator
+    printf("Page | Frames               | Status\n");       // Display column headers
+    printf("----------------------------------------\n");   // Display column separator
     
-    for (int i = 0; i < numPages; i++) {
-        int currentPage = pages[i];
-        printf(" %2d  ", currentPage);
-        time++;
+    for (int i = 0; i < numPages; i++) {  // Loop through each page in reference string
+        int currentPage = pages[i];      // Get current page number
+        printf(" %2d  ", currentPage);   // Display current page number
+        time++;                          // Increment time counter for each page reference
         
-        // Check if page is already in frame
-        int position = searchPage(currentPage, frames, numFrames);
+        // Check if page is already present in a frame (page hit check)
+        int position = searchPage(currentPage, frames, numFrames);  // Search for page
         
-        if (position != -1) {
-            // Page Hit - Update last used time
-            displayFrames(frames, numFrames);
-            printf(" HIT\n");
-            pageHits++;
-            lastUsed[position] = time;
-        } else {
-            // Page Fault - Find victim page
-            int replaceIndex = 0;
+        if (position != -1) {            // If page found in frames (page hit)
+            displayFrames(frames, numFrames);  // Display current frame state
+            printf(" HIT\n");            // Display "HIT" status
+            pageHits++;                  // Increment hit counter
+            lastUsed[position] = time;   // Update last used time for this frame (important for LRU)
+        } else {                         // If page not found (page fault)
+            int replaceIndex = 0;        // Variable to store which frame to replace
             
-            // Check if there's an empty frame
-            bool emptyFound = false;
-            for (int j = 0; j < numFrames; j++) {
-                if (frames[j] == -1) {
-                    replaceIndex = j;
-                    emptyFound = true;
-                    break;
+            // First check if there's an empty frame available
+            bool emptyFound = false;     // Flag to track if empty frame found
+            for (int j = 0; j < numFrames; j++) {  // Loop through all frames
+                if (frames[j] == -1) {   // If frame is empty
+                    replaceIndex = j;    // Use this empty frame
+                    emptyFound = true;   // Set flag that empty frame found
+                    break;               // Exit loop (no need to search further)
                 }
             }
             
-            // If no empty frame, find LRU page
-            if (!emptyFound) {
-                int minTime = lastUsed[0];
-                replaceIndex = 0;
+            // If no empty frame found, find least recently used page to replace
+            if (!emptyFound) {           // If all frames are full
+                int minTime = lastUsed[0];  // Assume first frame is LRU (smallest time)
+                replaceIndex = 0;        // Start with first frame as candidate
                 
-                for (int j = 1; j < numFrames; j++) {
-                    if (lastUsed[j] < minTime) {
-                        minTime = lastUsed[j];
-                        replaceIndex = j;
+                for (int j = 1; j < numFrames; j++) {  // Loop through remaining frames
+                    if (lastUsed[j] < minTime) {  // If this frame used earlier than current minimum
+                        minTime = lastUsed[j];    // Update minimum time
+                        replaceIndex = j;         // Update replacement candidate
                     }
                 }
             }
             
-            // Replace the page
-            frames[replaceIndex] = currentPage;
-            lastUsed[replaceIndex] = time;
+            // Replace the page at selected index
+            frames[replaceIndex] = currentPage;  // Put new page in selected frame
+            lastUsed[replaceIndex] = time;       // Update last used time for this frame
             
-            displayFrames(frames, numFrames);
-            printf(" FAULT\n");
-            pageFaults++;
+            displayFrames(frames, numFrames);    // Display updated frame state
+            printf(" FAULT\n");          // Display "FAULT" status
+            pageFaults++;                // Increment fault counter
         }
     }
     
-    printf("========================================\n");
-    printf("RESULTS:\n");
-    printf("Total Page References: %d\n", numPages);
+    printf("========================================\n");  // Display results separator
+    printf("RESULTS:\n");                                 // Display results header
+    printf("Total Page References: %d\n", numPages);     // Display total pages processed
+    printf("Page Faults: %d\n", pageFaults);             // Display total page faults
+    printf("Page Hits: %d\n", pageHits);                 // Display total page hits
+    printf("Hit Ratio: %.2f%%\n", (pageHits * 100.0) / numPages);      // Calculate and display hit percentage
+    printf("Fault Ratio: %.2f%%\n", (pageFaults * 100.0) / numPages);  // Calculate and display fault percentage
+    printf("========================================\n");  // Display end separator
+}
     printf("Page Faults: %d\n", pageFaults);
     printf("Page Hits: %d\n", pageHits);
     printf("Hit Ratio: %.2f%%\n", (pageHits * 100.0) / numPages);
@@ -175,163 +177,163 @@ void lru(int pages[], int numPages, int numFrames) {
     printf("========================================\n");
 }
 
-// Function to input page reference string
-int inputPages(int pages[]) {
-    int numPages;
+// Function to get page reference string from user input
+int inputPages(int pages[]) {           // Takes array to store pages, returns number of pages entered
+    int numPages;                        // Variable to store count of pages
     
-    printf("\n--- Enter Page Reference String ---\n");
-    printf("Enter number of page references: ");
-    scanf("%d", &numPages);
+    printf("\n--- Enter Page Reference String ---\n");  // Display input section header
+    printf("Enter number of page references: ");        // Prompt for count
+    scanf("%d", &numPages);              // Read number of pages from user
     
-    if (numPages > MAX_PAGES) {
-        printf("Error: Maximum pages allowed is %d\n", MAX_PAGES);
-        return 0;
+    if (numPages > MAX_PAGES) {          // Check if exceeds maximum limit
+        printf("Error: Maximum pages allowed is %d\n", MAX_PAGES);  // Display error message
+        return 0;                        // Return 0 to indicate error
     }
     
-    printf("Enter page reference string:\n");
-    for (int i = 0; i < numPages; i++) {
-        printf("Page %d: ", i + 1);
-        scanf("%d", &pages[i]);
+    printf("Enter page reference string:\n");  // Prompt for page numbers
+    for (int i = 0; i < numPages; i++) { // Loop to input each page
+        printf("Page %d: ", i + 1);      // Prompt for specific page (1-based display)
+        scanf("%d", &pages[i]);          // Read page number into array
     }
     
-    printf("\nPage Reference String: ");
-    for (int i = 0; i < numPages; i++) {
-        printf("%d ", pages[i]);
+    printf("\nPage Reference String: ");  // Display confirmation header
+    for (int i = 0; i < numPages; i++) { // Loop through all pages
+        printf("%d ", pages[i]);         // Display each page number
     }
-    printf("\n");
+    printf("\n");                        // New line after displaying all pages
     
-    return numPages;
+    return numPages;                     // Return count of pages entered
 }
 
-// Function to use example page reference string
-int useExamplePages(int pages[]) {
-    // Example: 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1
+// Function to load predefined example page reference string for quick testing
+int useExamplePages(int pages[]) {      // Takes array to store pages, returns number of pages
+    // Predefined example page reference string (commonly used pattern)
     int example[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1};
-    int numPages = 20;
+    int numPages = 20;                   // Number of pages in example
     
-    for (int i = 0; i < numPages; i++) {
-        pages[i] = example[i];
+    for (int i = 0; i < numPages; i++) { // Loop to copy example data
+        pages[i] = example[i];           // Copy each page to main array
     }
     
-    printf("\nExample Page Reference String Loaded:\n");
-    printf("Pages: ");
-    for (int i = 0; i < numPages; i++) {
-        printf("%d ", pages[i]);
+    printf("\nExample Page Reference String Loaded:\n");  // Display confirmation
+    printf("Pages: ");                   // Display label
+    for (int i = 0; i < numPages; i++) { // Loop through all pages
+        printf("%d ", pages[i]);         // Display each page number
     }
-    printf("\n");
+    printf("\n");                        // New line at end
     
-    return numPages;
+    return numPages;                     // Return count of pages loaded
 }
 
-// Function to compare both algorithms
-void compareAlgorithms(int pages[], int numPages, int numFrames) {
-    printf("\n========================================\n");
-    printf("    ALGORITHM COMPARISON\n");
-    printf("========================================\n");
+// Function to run and compare both FIFO and LRU algorithms side-by-side
+void compareAlgorithms(int pages[], int numPages, int numFrames) {  // Takes pages, page count, frame count
+    printf("\n========================================\n");  // Display comparison header
+    printf("    ALGORITHM COMPARISON\n");                  // Display title
+    printf("========================================\n");    // Display separator
     
-    // Run FIFO
-    fifo(pages, numPages, numFrames);
+    // Run FIFO algorithm first
+    fifo(pages, numPages, numFrames);    // Call FIFO function
     
-    printf("\n");
+    printf("\n");                        // Blank line separator between algorithms
     
-    // Run LRU
-    lru(pages, numPages, numFrames);
+    // Run LRU algorithm second
+    lru(pages, numPages, numFrames);     // Call LRU function
     
-    printf("\n========================================\n");
-    printf("Compare the results above to see which\n");
-    printf("algorithm performs better for this\n");
-    printf("page reference string.\n");
-    printf("========================================\n");
+    printf("\n========================================\n");  // Display footer separator
+    printf("Compare the results above to see which\n");     // Display comparison instruction
+    printf("algorithm performs better for this\n");          // Continuation of instruction
+    printf("page reference string.\n");                     // End of instruction
+    printf("========================================\n");    // Display end separator
 }
 
-int main() {
-    int choice, numPages = 0, numFrames;
-    int pages[MAX_PAGES];
+int main() {                             // Main function - program execution starts here
+    int choice, numPages = 0, numFrames; // choice: menu option, numPages: count of pages (init to 0), numFrames: frame count
+    int pages[MAX_PAGES];                // Array to store page reference string
     
-    printf("\n╔════════════════════════════════════════╗\n");
-    printf("║   PAGE REPLACEMENT SIMULATOR           ║\n");
-    printf("║   FIFO & LRU Algorithms                ║\n");
-    printf("╚════════════════════════════════════════╝\n");
+    printf("\n╔════════════════════════════════════════╗\n");  // Display top border
+    printf("║   PAGE REPLACEMENT SIMULATOR           ║\n");    // Display program title
+    printf("║   FIFO & LRU Algorithms                ║\n");    // Display subtitle
+    printf("╚════════════════════════════════════════╝\n");    // Display bottom border
     
-    while (1) {
-        printf("\n========================================\n");
-        printf("             MAIN MENU\n");
-        printf("========================================\n");
-        printf("1. Enter page reference string\n");
-        printf("2. Use example page reference string\n");
-        printf("3. Simulate FIFO algorithm\n");
-        printf("4. Simulate LRU algorithm\n");
-        printf("5. Compare both algorithms\n");
-        printf("6. Exit\n");
-        printf("========================================\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
+    while (1) {                          // Infinite loop for menu system (until exit)
+        printf("\n========================================\n");  // Display menu separator
+        printf("             MAIN MENU\n");                     // Display menu title
+        printf("========================================\n");    // Display menu separator
+        printf("1. Enter page reference string\n");             // Option 1: Manual input
+        printf("2. Use example page reference string\n");       // Option 2: Load example
+        printf("3. Simulate FIFO algorithm\n");                 // Option 3: Run FIFO only
+        printf("4. Simulate LRU algorithm\n");                  // Option 4: Run LRU only
+        printf("5. Compare both algorithms\n");                 // Option 5: Run both and compare
+        printf("6. Exit\n");                                    // Option 6: Exit program
+        printf("========================================\n");    // Display menu separator
+        printf("Enter your choice: ");                          // Prompt for choice
+        scanf("%d", &choice);            // Read user's menu choice
         
-        switch (choice) {
-            case 1:
-                numPages = inputPages(pages);
-                break;
+        switch (choice) {                // Check which option user selected
+            case 1:                      // If user chose to enter pages manually
+                numPages = inputPages(pages);  // Call input function and store count
+                break;                   // Exit switch statement
                 
-            case 2:
-                numPages = useExamplePages(pages);
-                break;
+            case 2:                      // If user chose to use example
+                numPages = useExamplePages(pages);  // Call example function and store count
+                break;                   // Exit switch statement
                 
-            case 3:
-                if (numPages == 0) {
-                    printf("\nPlease enter page reference string first!\n");
-                    break;
+            case 3:                      // If user chose FIFO simulation
+                if (numPages == 0) {     // Check if page string has been entered
+                    printf("\nPlease enter page reference string first!\n");  // Display error
+                    break;               // Exit case
                 }
-                printf("\nEnter number of frames: ");
-                scanf("%d", &numFrames);
+                printf("\nEnter number of frames: ");  // Prompt for frame count
+                scanf("%d", &numFrames); // Read frame count
                 
-                if (numFrames > MAX_FRAMES) {
-                    printf("Error: Maximum frames allowed is %d\n", MAX_FRAMES);
-                    break;
-                }
-                
-                fifo(pages, numPages, numFrames);
-                break;
-                
-            case 4:
-                if (numPages == 0) {
-                    printf("\nPlease enter page reference string first!\n");
-                    break;
-                }
-                printf("\nEnter number of frames: ");
-                scanf("%d", &numFrames);
-                
-                if (numFrames > MAX_FRAMES) {
-                    printf("Error: Maximum frames allowed is %d\n", MAX_FRAMES);
-                    break;
+                if (numFrames > MAX_FRAMES) {  // Check if exceeds maximum
+                    printf("Error: Maximum frames allowed is %d\n", MAX_FRAMES);  // Display error
+                    break;               // Exit case
                 }
                 
-                lru(pages, numPages, numFrames);
-                break;
+                fifo(pages, numPages, numFrames);  // Call FIFO algorithm
+                break;                   // Exit switch statement
                 
-            case 5:
-                if (numPages == 0) {
-                    printf("\nPlease enter page reference string first!\n");
-                    break;
+            case 4:                      // If user chose LRU simulation
+                if (numPages == 0) {     // Check if page string has been entered
+                    printf("\nPlease enter page reference string first!\n");  // Display error
+                    break;               // Exit case
                 }
-                printf("\nEnter number of frames: ");
-                scanf("%d", &numFrames);
+                printf("\nEnter number of frames: ");  // Prompt for frame count
+                scanf("%d", &numFrames); // Read frame count
                 
-                if (numFrames > MAX_FRAMES) {
-                    printf("Error: Maximum frames allowed is %d\n", MAX_FRAMES);
-                    break;
+                if (numFrames > MAX_FRAMES) {  // Check if exceeds maximum
+                    printf("Error: Maximum frames allowed is %d\n", MAX_FRAMES);  // Display error
+                    break;               // Exit case
                 }
                 
-                compareAlgorithms(pages, numPages, numFrames);
-                break;
+                lru(pages, numPages, numFrames);  // Call LRU algorithm
+                break;                   // Exit switch statement
                 
-            case 6:
-                printf("\nExiting program. Thank you!\n");
-                exit(0);
+            case 5:                      // If user chose to compare algorithms
+                if (numPages == 0) {     // Check if page string has been entered
+                    printf("\nPlease enter page reference string first!\n");  // Display error
+                    break;               // Exit case
+                }
+                printf("\nEnter number of frames: ");  // Prompt for frame count
+                scanf("%d", &numFrames); // Read frame count
                 
-            default:
-                printf("\nInvalid choice! Please try again.\n");
+                if (numFrames > MAX_FRAMES) {  // Check if exceeds maximum
+                    printf("Error: Maximum frames allowed is %d\n", MAX_FRAMES);  // Display error
+                    break;               // Exit case
+                }
+                
+                compareAlgorithms(pages, numPages, numFrames);  // Call comparison function
+                break;                   // Exit switch statement
+                
+            case 6:                      // If user chose to exit
+                printf("\nExiting program. Thank you!\n");  // Display exit message
+                exit(0);                 // Terminate program with success code
+                
+            default:                     // If user entered invalid option
+                printf("\nInvalid choice! Please try again.\n");  // Display error message
         }
     }
     
-    return 0;
+    return 0;                            // Return 0 to indicate successful execution (unreachable)
 }

@@ -13,101 +13,101 @@
  * The program runs 50 random iterations of producer/consumer operations
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h>      // For input/output functions like printf, scanf
+#include <stdlib.h>     // For rand() function
 
 // Semaphore variables
-int mutex = 1;    // Binary semaphore for mutual exclusion
-int full = 0;     // Counting semaphore for full slots
-int empty = 5;    // Counting semaphore for empty slots (buffer size = 5)
-int x = 0;        // Item counter
+int mutex = 1;          // Binary semaphore for mutual exclusion (1 = available, 0 = locked)
+int full = 0;           // Counting semaphore for full slots (initially 0, no items in buffer)
+int empty = 5;          // Counting semaphore for empty slots (buffer size = 5, all empty initially)
+int x = 0;              // Item counter to track produced items
 
 // Semaphore wait operation (P operation / down operation)
-int wait(int *s)
+int wait(int *s)        // Takes pointer to semaphore as parameter
 {
-    return --(*s);
+    return --(*s);      // Decrements semaphore value by 1 and returns new value
 }
 
 // Semaphore signal operation (V operation / up operation)
-int signal(int *s)
+int signal(int *s)      // Takes pointer to semaphore as parameter
 {
-    return ++(*s);
+    return ++(*s);      // Increments semaphore value by 1 and returns new value
 }
 
 // Producer function
-void producer()
+void producer()         // Function to produce items and add to buffer
 {
-    wait(&mutex);      // Enter critical section
-    wait(&empty);      // Decrease empty count
-    signal(&full);     // Increase full count
+    wait(&mutex);       // Acquire mutex lock to enter critical section
+    wait(&empty);       // Decrease empty slot count (one slot will be filled)
+    signal(&full);      // Increase full slot count (one more item in buffer)
     
-    x++;               // Produce item
-    printf("Producer produces item %d\n", x);
+    x++;                // Increment item counter (produce new item)
+    printf("Producer produces item %d\n", x);  // Display produced item number
     
-    signal(&mutex);    // Exit critical section
+    signal(&mutex);     // Release mutex lock to exit critical section
 }
 
 // Consumer function
-void consumer()
+void consumer()         // Function to consume items from buffer
 {
-    wait(&mutex);      // Enter critical section
-    wait(&full);       // Decrease full count
-    signal(&empty);    // Increase empty count
+    wait(&mutex);       // Acquire mutex lock to enter critical section
+    wait(&full);        // Decrease full slot count (one item will be consumed)
+    signal(&empty);     // Increase empty slot count (one slot becomes free)
     
-    printf("Consumer consumes item %d\n", x);
-    x--;               // Consume item
+    printf("Consumer consumes item %d\n", x);  // Display consumed item number
+    x--;                // Decrement item counter (consume item)
     
-    signal(&mutex);    // Exit critical section
+    signal(&mutex);     // Release mutex lock to exit critical section
 }
 
 
 
-int main()
+int main()              // Main function - program execution starts here
 {
-    int n, t;
+    int n, t;           // n = random choice (0 or 1), t = loop counter
     
-    printf("║  PRODUCER-CONSUMER PROBLEM SIMULATOR  ║\n");
-    printf("║     Using Semaphores (50 iterations)   ║\n");
+    printf("║  PRODUCER-CONSUMER PROBLEM SIMULATOR  ║\n");  // Display program title
+    printf("║     Using Semaphores (50 iterations)   ║\n");  // Display subtitle
     
-    for(t = 0; t < 50; t++)
+    for(t = 0; t < 50; t++)  // Loop 50 times for simulation
     {
-        int i = rand() % 100;
-        n = i % 2;
+        int i = rand() % 100;  // Generate random number between 0-99
+        n = i % 2;             // Convert to 0 or 1 (even=0=producer, odd=1=consumer)
         
-        switch (n) 
+        switch (n)             // Check which operation to perform
         {
-            case 0:  // Try to produce
-                if ((mutex == 1) && (empty != 0)) 
+            case 0:            // If n=0, try to produce
+                if ((mutex == 1) && (empty != 0))  // Check if mutex available and buffer not full
                 {
-                    producer();
+                    producer();  // Call producer function
                 }
-                else 
+                else           // If buffer is full
                 {
-                    printf("Buffer is full! Cannot produce.\n");
+                    printf("Buffer is full! Cannot produce.\n");  // Display error message
                 }
-                break;
+                break;         // Exit switch statement
 
-            case 1:  // Try to consume
-                if ((mutex == 1) && (full != 0)) 
+            case 1:            // If n=1, try to consume
+                if ((mutex == 1) && (full != 0))  // Check if mutex available and buffer not empty
                 {
-                    consumer();
+                    consumer();  // Call consumer function
                 }
-                else 
+                else           // If buffer is empty
                 {
-                    printf("Buffer is empty! Cannot consume.\n");
+                    printf("Buffer is empty! Cannot consume.\n");  // Display error message
                 }
-                break;
+                break;         // Exit switch statement
         } 
     }
     
-    printf("\n========================================\n");
-    printf("Simulation completed!\n");
-    printf("Final Semaphore Values:\n");
-    printf("  mutex = %d\n", mutex);
-    printf("  empty = %d\n", empty);
-    printf("  full  = %d\n", full);
-    printf("  Items in buffer = %d\n", x);
-    printf("========================================\n");
+    printf("\n========================================\n");  // Display separator
+    printf("Simulation completed!\n");                 // Display completion message
+    printf("Final Semaphore Values:\n");               // Display final state header
+    printf("  mutex = %d\n", mutex);                   // Display final mutex value
+    printf("  empty = %d\n", empty);                   // Display final empty slots count
+    printf("  full  = %d\n", full);                    // Display final full slots count
+    printf("  Items in buffer = %d\n", x);             // Display final items in buffer
+    printf("========================================\n");  // Display separator
     
-    return 0;
+    return 0;          // Return 0 to indicate successful program execution
 }
